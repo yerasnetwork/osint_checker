@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+data/
+reports/
+.env
+.pytest_cache/
+dist/
+osint_checker-source.zip

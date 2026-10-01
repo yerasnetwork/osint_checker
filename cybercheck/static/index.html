@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1118">
+  <title>CyberCheck — единая проверка сайта</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101822'/%3E%3Cpath d='M45 19H25l-9 13 9 13h20M36 25l-6 7 6 7' fill='none' stroke='%239be6b0' stroke-width='5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="CyberCheck — главная"><span class="brand-mark">C<span>›</span></span><span>cyber<span class="brand-light">check</span><small>NETWORK INTELLIGENCE</small></span></a>
+    <div class="workspace-tag"><span class="dot"></span> Локальное пространство <span class="mono">01</span></div>
+    <button class="nav-button active" id="new-scan"><span class="nav-icon">⌁</span> Новая проверка <span class="nav-plus">+</span></button>
+    <div class="sidebar-label">ИСТОРИЯ ПРОВЕРОК <span id="history-count">0</span></div>
+    <div id="history" class="history"><p class="side-empty">Здесь появятся ваши проверки</p></div>
+    <div class="sidebar-bottom"><div class="engine"><span class="dot"></span><span id="connection">Подключение…</span></div><span class="mono muted">CYBERCHECK / v0.1.0</span></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>Рабочее пространство <span class="divider">/</span> <strong>Обзор инфраструктуры</strong></span><span class="top-status"><span class="dot"></span> LOCAL</span></header>
+    <div class="content">
+      <section class="intro"><div><div class="eyebrow"><span class="short-line"></span> ЕДИНЫЙ ИНСТРУМЕНТ РАЗВЕДКИ</div><h1>Вся поверхность.<br><span>Один отчёт.</span></h1><p>Порты, домены и открытые данные о сайте — в одном месте.</p></div><div class="radar" aria-hidden="true"><span class="radar-line"></span><span class="radar-dot one"></span><span class="radar-dot two"></span><span class="radar-dot three"></span><span class="radar-center">+</span></div></section>
+      <section class="scan-panel">
+        <div class="panel-heading"><h2><span class="step">01</span> Настройка проверки</h2><span class="muted mono small">DOMAIN / URL / IP</span></div>
+        <form id="scan-form">
+          <label for="target" class="field-label">Цель проверки</label>
+          <div class="target-row"><div class="target-input"><span aria-hidden="true">⌕</span><input id="target" name="target" placeholder="example.com или https://example.com" required maxlength="2048" autocomplete="off" spellcheck="false" aria-describedby="scope-note"></div><button id="start" class="primary" type="submit">Запустить проверку <span>↗</span></button></div>
+          <div class="config-row"><div class="profile-field"><label for="profile" class="field-label">Профиль портов</label><select id="profile"><option value="quick">Быстрый · 25 портов</option><option value="standard">Стандартный</option><option value="full">Полный · 65 535 портов</option><option value="custom">Свои порты</option></select></div><div class="modules-field"><span class="field-label">Модули</span><div class="module-pills"><label><input type="checkbox" name="module" value="ports" checked><span>Порты</span></label><label><input type="checkbox" name="module" value="dns" checked><span>DNS</span></label><label><input type="checkbox" name="module" value="subdomains" checked><span>Поддомены</span></label><label><input type="checkbox" name="module" value="web" checked><span>Веб</span></label><label><input type="checkbox" name="module" value="tls" checked><span>TLS</span></label><label><input type="checkbox" name="module" value="osint" checked><span>OSINT</span></label></div></div></div>
+          <div id="custom-ports" hidden><label for="ports" class="field-label">Порты и диапазоны</label><input id="ports" class="text-input" placeholder="22,80,443,8000-8100" maxlength="4096"></div>
+          <details class="advanced"><summary>Дополнительные настройки <span>⌄</span></summary><div class="settings-grid"><label>Соединений одновременно<input id="concurrency" type="number" value="32" min="1" max="128" required></label><label>Запросов / секунду<input id="rate" type="number" value="40" min="1" max="200" required></label><label>Таймаут TCP, секунд<input id="timeout" type="number" value="2" min="0.2" max="15" step="0.1" required></label><label>IP для проверки<input id="max-addresses" type="number" value="1" min="1" max="4" required></label><label>Лимит поддоменов<input id="max-subdomains" type="number" value="100" min="1" max="500" required></label></div><div class="check-options"><label><input id="public-sources" type="checkbox" checked> Публичные источники: сертификаты, DNS, RDAP, ASN</label><label><input id="probe-subdomains" type="checkbox"> Проверять HTTPS найденных поддоменов</label><label><input id="nmap" type="checkbox"> Определять службы через Nmap <span id="nmap-note" class="muted"></span></label></div></details>
+          <p id="scope-note" class="scope-note"><span>◎</span> Порты проверяются у выбранной цели. Найденные поддомены собираются в отдельный список.</p>
+          <div id="form-error" class="error-box" role="alert" hidden></div>
+        </form>
+      </section>
+      <section id="report" class="report-section" hidden>
+        <div class="report-heading"><div><div class="eyebrow">РЕЗУЛЬТАТЫ ПРОВЕРКИ</div><h2 id="report-target"></h2><div id="report-meta" class="muted mono small"></div></div><div class="report-actions"><button id="cancel" class="danger" hidden>Остановить</button><a id="export-html" class="secondary" href="#">HTML ↗</a><a id="export-json" class="secondary" href="#">JSON ↓</a><a id="export-csv" class="secondary" href="#">CSV ↓</a></div></div>
+        <div class="progress-panel"><div><span id="scan-status" class="badge"></span><span id="scan-progress-label" class="muted small"></span></div><progress id="scan-progress" value="0" max="100"></progress><div id="module-statuses" class="module-statuses"></div></div>
+        <div class="metrics"><article><span class="metric-label">ОТКРЫТЫЕ ПОРТЫ <span>↗</span></span><strong id="metric-ports">—</strong><small id="metric-ports-detail">TCP-соединения</small></article><article><span class="metric-label">ПОДДОМЕНЫ <span>⌘</span></span><strong id="metric-domains">—</strong><small>С подтверждённым DNS</small></article><article><span class="metric-label">DNS-ЗАПИСИ <span>≋</span></span><strong id="metric-dns">—</strong><small>A · AAAA · MX · TXT и другие</small></article><article><span class="metric-label">ЗАМЕЧАНИЯ <span>◎</span></span><strong id="metric-findings">—</strong><small>Наблюдения по конфигурации</small></article></div>
+        <div class="results-panel"><div class="tabs" role="tablist" aria-label="Разделы отчёта"><button role="tab" aria-selected="true" data-tab="overview">Обзор</button><button role="tab" aria-selected="false" data-tab="ports">Порты</button><button role="tab" aria-selected="false" data-tab="subdomains">Поддомены</button><button role="tab" aria-selected="false" data-tab="dns">DNS</button><button role="tab" aria-selected="false" data-tab="web">Веб</button><button role="tab" aria-selected="false" data-tab="tls">TLS</button><button role="tab" aria-selected="false" data-tab="osint">OSINT</button><button role="tab" aria-selected="false" data-tab="findings">Замечания</button><button role="tab" aria-selected="false" data-tab="events">Журнал</button></div><div class="result-toolbar"><span id="result-heading">Открытые порты и обнаруженные имена</span><div><select id="port-state" aria-label="Состояние порта" hidden><option value="all">Все состояния</option><option value="open">Открытые</option><option value="closed">Закрытые</option><option value="no_response">Нет ответа</option><option value="error">Ошибки</option></select><input id="result-search" placeholder="Поиск в результатах…" aria-label="Поиск в результатах" maxlength="100"></div></div><div id="result-body" role="tabpanel" aria-live="polite"></div><div id="pagination" class="pagination" hidden><button id="page-prev" class="secondary">← Назад</button><span id="page-label" class="muted mono small"></span><button id="page-next" class="secondary">Далее →</button></div></div>
+      </section>
+      <section id="empty-state" class="empty-state"><div class="empty-symbol" aria-hidden="true">⌁</div><h2>Начните с адреса сайта</h2><p>После запуска здесь появятся открытые порты,<br>найденные домены и сведения об инфраструктуре.</p><div class="empty-tags"><span>01 / TCP PORTS</span><span>02 / DOMAIN DISCOVERY</span><span>03 / OPEN SOURCES</span></div></section>
+      <footer><span>CYBERCHECK <span class="muted">/</span> Знать, что доступно снаружи.</span><span>Наблюдения · Источники · Один отчёт</span></footer>
+    </div>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
